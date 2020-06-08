@@ -160,12 +160,10 @@ include/userpci/gfp.h
 include/userpci/list.h
 include/userpci/module.h
 include/userpci/slab.h
-include/userpci/string.h
 include/value.npb.h
 include/value.pb.h
 include/vtable.h
 include/xenomai2.h
-src/Makefile
 src/hal/accessor/acctest.amd64.s
 src/hal/accessor/acctest.arm.s
 src/hal/accessor/acctest.c
@@ -898,9 +896,6 @@ src/objects/hal/user_comps/scounter.c
 src/objects/machinetalk/msgcomponents/remote.c
 src/objects/machinetalk/msgcomponents/ringread.c
 src/objects/machinetalk/msgcomponents/ringwrite.c
-src/regressions/check-tests/check_tests.c
-src/regressions/check-tests/ck-suite.h
-src/regressions/check-tests/triple-buffer-suite.h
 src/rtapi/chkenv.c
 src/rtapi/examples/shmem/common.h
 src/rtapi/examples/shmem/shmemtask.c
@@ -1062,7 +1057,3 @@ src/rtapi/userpci/slab.h
 src/rtapi/userpci/string.c
 src/rtapi/userpci/string.h
 src/rtapi/vsnprintf.h
-src/tests/mathtest.c
-tests/bitops.0/bitops.c
-tests/pll_correction/pll_time.h
-tests/rtapi.0/rtapi_test.c
