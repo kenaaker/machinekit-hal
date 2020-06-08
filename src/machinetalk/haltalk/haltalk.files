@@ -1,0 +1,8 @@
+encode-varint.cc
+haltalk.hh
+haltalk_bridge.cc
+haltalk_command.cc
+haltalk_group.cc
+haltalk_introspect.cc
+haltalk_main.cc
+haltalk_rcomp.cc
