@@ -426,6 +426,7 @@ src/hal/vtable-example/vcode.c
 src/hal/vtable-example/vtexample.h
 src/hal/vtable-example/vtexport.c
 src/hal/vtable-example/vtuse.c
+src/inifile/Submakefile
 src/inifile/inifile.cc
 src/inifile/inivar.cc
 src/inifile/mk-inifile.h
