@@ -5,8 +5,7 @@ ifeq ($(USE_PROTOBUF),yes)
 #ifeq ($(BUILD_EXAMPLES),yes)
 PBEX := $(MACHINETALK)/support
 
-ENCDEC_SRCS :=  $(addprefix $(PBEX)/, \
-	encdec.cc)
+ENCDEC_SRCS :=  $(addprefix $(PBEX)/, encdec.cc)
 ENCDEC_CXX_CFLAGS = -g  $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
 ENCDEC_CXX_LDFLAGS=  $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lstdc++
 
@@ -17,12 +16,10 @@ $(call TOOBJSDEPS, $(ENCDEC_SRCS)) : EXTRAFLAGS += $(ENCDEC_CXX_CFLAGS)
 ../bin/encdec: $(call TOOBJS, $(ENCDEC_SRCS)) \
 	$(PB2CXX_PROTOLIB)  ../lib/libmtalk.so ../lib/libmachinetalk-pb2++.so ../lib/libmkini.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  \
-	 $(ENCDEC_CXX_LDFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^  $(ENCDEC_CXX_LDFLAGS)
 
 #----
-POSITION_SRCS :=  $(addprefix $(PBEX)/, \
-	position.cc)
+POSITION_SRCS :=  $(addprefix $(PBEX)/, position.cc)
 POSITION_CXX_CFLAGS = -g  $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
 POSITION_CXX_LDFLAGS=  $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lstdc++
 
@@ -33,13 +30,12 @@ $(call TOOBJSDEPS, $(POSITION_SRCS)) : EXTRAFLAGS += $(POSITION_CXX_CFLAGS)
 ../bin/position: $(call TOOBJS, $(POSITION_SRCS)) \
 	 ../lib/libmtalk.so $(PB2CXX_PROTOLIB)  ../lib/libmkini.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  \
+	$(CC) $(LDFLAGS) -o $@ $^  \
 	 $(POSITION_CXX_LDFLAGS)
 
 #---
 
-NPDECODE_SRCS :=  $(addprefix $(PBEX)/, \
-	npbdecode.c)
+NPDECODE_SRCS :=  $(addprefix $(PBEX)/,	npbdecode.c)
 NPBC_PROTOLIB = ../lib/libmachinetalk-npb.so
 NPDECODE_CFLAGS = -g  -I../../ -DPB_FIELD_32BIT
 NPDECODE_LDFLAGS = $(NPBC_PROTOLIB)
@@ -49,12 +45,11 @@ $(call TOOBJSDEPS, $(NPDECODE_SRCS)) : EXTRAFLAGS += $(NPDECODE_CFLAGS)
 ../bin/npbdecode: $(call TOOBJS, $(NPDECODE_SRCS)) \
 	$(NPBC_PROTOLIB)
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  \
+	$(CC) $(LDFLAGS) -o $@ $^  \
 	 $(NPDECODE_LDFLAGS) $(NPDECODE_LDFLAGS)
 
 
-RTPRINTF_SRCS :=  $(addprefix $(PBEX)/, \
-	rtprintf.c)
+RTPRINTF_SRCS :=  $(addprefix $(PBEX)/, rtprintf.c)
 RTPRINTF_CCFLAGS := -g -DPB_FIELD_32BIT
 RTPRINTF_LDFLAGS := -g
 
@@ -63,7 +58,7 @@ $(call TOOBJSDEPS, $(RTPRINTF_SRCS)) : EXTRAFLAGS += $(RTPRINTF_CCFLAGS)
 ../bin/rtprintf: $(call TOOBJS, $(RTPRINTF_SRCS)) \
 	../lib/libmachinetalk-npb.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RTPRINTF_LDFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RTPRINTF_LDFLAGS)
 
 
 RAWREAD_SRCS :=  $(PBEX)/rawread.c \
@@ -75,19 +70,17 @@ $(call TOOBJSDEPS, $(RAWREAD_SRCS)) : EXTRAFLAGS += $(RAWREAD_CCFLAGS)
 
 ../bin/rawread: $(call TOOBJS, $(RAWREAD_SRCS))
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RAWREAD_LDFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RAWREAD_LDFLAGS)
 
 ../include/%.h: ./$(PBEX)/%.h
 	$(ECHO) Copying header file $@
 	@mkdir -p $(dir $@)
-	$(Q)cp $^ $@
+	cp $^ $@
 
 ../include/%.hh: ./$(PBEX)/%.hh
 	$(ECHO) Copying header file $@
 	@mkdir -p $(dir $@)
-	$(Q)cp $^ $@
-
-
+	cp $^ $@
 
 UNIONREAD_SRCS :=  $(PBEX)/unionread.c \
 		 $(MACHINETALK)/nanopb/pb_decode.c \
@@ -100,23 +93,23 @@ $(call TOOBJSDEPS, $(UNIONREAD_SRCS)) : EXTRAFLAGS += $(UNIONREAD_CCFLAGS)
 
 ../bin/unionread: $(call TOOBJS, $(UNIONREAD_SRCS))
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(UNIONREAD_LDFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(UNIONREAD_LDFLAGS)
 
 ../include/%.h: ./$(PBEX)/%.h
 	$(ECHO) Copying header file $@
 	@mkdir -p $(dir $@)
-	$(Q)cp $^ $@
+	cp $^ $@
 
 ../include/%.hh: ./$(PBEX)/%.hh
 	$(ECHO) Copying header file $@
 	@mkdir -p $(dir $@)
-	$(Q)cp $^ $@
+	cp $^ $@
 
 $(call TOOBJSDEPS, $(PBEX)/sizes.c) : EXTRAFLAGS +=
 
 ../bin/sizes: $(call TOOBJS, $(PBEX)/sizes.c)
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(LDFLAGS)
 
 USERSRCS += \
 	 $(RTPRINTF_SRCS) \
@@ -140,9 +133,9 @@ TARGETS += \
 
 ../lib/python/%.py: $(MACHINETALK)/support/%.py
 	@$(ECHO) Syntax checking python script $(notdir $@)
-	$(Q)$(PYTHON) -c 'import sys; compile(open(sys.argv[1]).read(), sys.argv[1], "exec")' $<
+	$(PYTHON) -c 'import sys; compile(open(sys.argv[1]).read(), sys.argv[1], "exec")' $<
 	$(ECHO) Copying python script $(notdir $@)
-	$(Q)cp $< $@
+	cp $< $@
 
 PYTARGETS += ../lib/python/pb2json.py
 
@@ -163,7 +156,7 @@ $(call TOOBJSDEPS, $(LINMOVE_SRCS)) : EXTRAFLAGS += $(LINMOVE_CXX_CFLAGS)
 ../bin/linmove: $(call TOOBJS, $(LINMOVE_SRCS)) \
 	../lib/libmtalk.so ../lib/libmachinetalk-pb2++.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  \
+	$(CC) $(LDFLAGS) -o $@ $^  \
 	 $(LINMOVE_CXX_LDFLAGS) $(PBJSONLIB)
 
 USERSRCS += $(LINMOVE_SRCS)

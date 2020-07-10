@@ -55,6 +55,7 @@ if options.debug:
     print >> sys.stderr, "jsgen=", options.jsgen
 
 def dir_of(filename, vpath, pathsep=os.pathsep):
+    if options.debug: print >> sys.stderr, "filename=%s" % (str(filename))
     for path in vpath:
         candidate = os.path.join(path, filename)
         if os.path.exists(candidate): return path
@@ -63,14 +64,18 @@ def dir_of(filename, vpath, pathsep=os.pathsep):
 res = CodeGeneratorResponse()
 
 def add_depends(fd):
-#    if options.debug: print >> sys.stderr, "fd=%s" % (str(fd))
+    if options.debug: print >> sys.stderr, "fd.name=%s" % (str(fd.name))
 
     ap = dir_of(fd.name, options.vpath)
     if options.debug: print >> sys.stderr, "dirof(%s)=%s" % (fd.name, ap)
 
-    prefix = fd.name[0:-6]
-    depend_file = CodeGeneratorResponse.File()
-    depend_file.name = prefix + '.d'
+    if ap is not None:
+        prefix = fd.name[0:-6]
+        depend_file = CodeGeneratorResponse.File()
+        depend_file.name = prefix + '.d'
+    else:
+        ap = "."
+        prefix = ""
 
     deplist = ap + "/" + fd.name + " "
     for f in fd.dependency:
@@ -78,6 +83,7 @@ def add_depends(fd):
 
     if options.debug:
         print >> sys.stderr, "deps(%s)=%s" % (fd.name, deplist)
+    
     depend_file.content =  '{0}/{1}.pb.cc  {0}/{1}.pb.h:   {2}\n'.format(options.cgen,prefix,deplist)
     depend_file.content += '{0}/{1}.pb-c.c {0}/{1}.pb-c.h: {2}\n'.format(options.cgen,prefix,deplist)
     depend_file.content += '{0}/{1}.npb.c  {0}/{1}.npb.h:  {2}\n'.format(options.cgen,prefix,deplist)
@@ -86,10 +92,13 @@ def add_depends(fd):
 
     return depend_file
 
+if options.debug: print >> sys.stderr, "res.file=%s" % (str(res.file))
 res.file.extend([add_depends(fileDescriptor) for fileDescriptor in req.proto_file])
+if options.debug: print >> sys.stderr, "res.file=%s" % (str(res.file))
 
 if sys.version_info >= (3, 0):
     # With Python 3 we write to buffer
     stdout.buffer.write(res.SerializeToString())
 else:
+    if options.debug: print >> sys.stderr, "res.SerializeToString=%s" % (str(res.SerializeToString))
     stdout.write(res.SerializeToString())

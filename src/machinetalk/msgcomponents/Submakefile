@@ -32,23 +32,4 @@ $(call TORTOBJS,$(PBGEN)/$(NAMESPACEDIR)/%.npb.c): \
 
 ../include/%.h: ./$(MSGCOMP_DIR)/%.h
 	$(ECHO) Copying header file $@
-	$(Q)cp $^ $@
-
-# ifeq ($(BUILD_EXAMPLES),yes)
-
-# RB_SRCS :=  $(addprefix hal/msgcomponents/, \
-# 	ringbench.c)
-
-# RB_CCFLAGS := -g
-# RB_LDFLAGS := -g -lpthread
-
-# $(call TOOBJSDEPS, $(RB_SRCS)) : EXTRAFLAGS += $(RB_CCFLAGS) -O0
-
-# ../bin/ringbench: $(call TOOBJS, $(RB_SRCS)) \
-# 	../lib/libhal.so
-# 	$(ECHO) Linking $(notdir $@)
-# 	$(Q)$(CC) -o $@ $^ $(LDFLAGS) $(RB_LDFLAGS)
-
-# USERSRCS += $(RB_SRCS) $(RB_SRCS)
-# TARGETS += ../bin/ringbench
-# endif
+	cp $^ $@

@@ -134,8 +134,7 @@ install: build
 	mkdir -p \
 	    debian/tmp/usr/lib/machinekit/modules \
 	    debian/tmp/usr/include/machinekit \
-	    debian/tmp/usr/include/machinekit/machinetalk/nanopb \
-	    debian/tmp/usr/include/machinekit/machinetalk/protobuf
+	    debian/tmp/usr/include/machinekit/machinetalk/nanopb
 
 	mkdir -p debian/tmp/etc/security/limits.d
 	cp src/rtapi/shmdrv/limits.d-machinekit.conf \
