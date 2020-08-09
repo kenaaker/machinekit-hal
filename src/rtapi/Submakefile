@@ -83,7 +83,7 @@ $(ULAPI_LIB).0: $(call TOOBJS, $(ULAPI_SRCS)) \
 	$(ECHO) Creating shared library $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CC) $(LDFLAGS) -Wl,-rpath,$(HAL_RTLIB_DIR) \
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-rpath,$(HAL_RTLIB_DIR) \
 	    -Wl,-soname,$(notdir $@) -shared \
 	    -o $@ $^ -ldl
 
@@ -119,20 +119,16 @@ $(call TORTOBJS, rtapi/flavor/rt-preempt.c): \
 	EXTRAFLAGS += $(LIBCGROUP_CFLAGS)
 
 # userland PCI support needs -ludev for rtapi.so
-$(RTLIBDIR)/rtapi.so: EXTRA_LDFLAGS += \
-	$(LIBUDEV_LIBS) $(RT_LDFLAGS) $(LIBCGROUP_LIBS)
+$(RTLIBDIR)/rtapi.so: EXTRA_LDFLAGS += $(LIBUDEV_LIBS) $(RT_LDFLAGS) $(LIBCGROUP_LIBS)
 
 ifeq ($(HAVE_XENOMAI2_THREADS),yes)
 # Build xenomai2_loader.so linked to Xenomai libs
 $(eval $(call c_comp_build_rules,rtapi/flavor/xenomai2_loader.o))
-$(RTLIBDIR)/xenomai2_loader.so: \
-	EXTRA_LDFLAGS += $(XENOMAI_LDFLAGS)
+$(RTLIBDIR)/xenomai2_loader.so: EXTRA_LDFLAGS += $(XENOMAI_LDFLAGS)
 
 # Set Xenomai CFLAGS
-$(call TORTOBJS, $(XENOMAI_SRC)): \
-	EXTRA_CFLAGS += $(XENOMAI_RTFLAGS)
-$(call TORTOBJS, rtapi/flavor/xenomai2_loader.c): \
-	EXTRA_CFLAGS += $(XENOMAI_RTFLAGS)
+$(call TORTOBJS, $(XENOMAI_SRC)): EXTRA_CFLAGS += $(XENOMAI_RTFLAGS)
+$(call TORTOBJS, rtapi/flavor/xenomai2_loader.c): EXTRA_CFLAGS += $(XENOMAI_RTFLAGS)
 endif
 
 ##################################################################
@@ -254,6 +250,7 @@ $(call TOOBJSDEPS, rtapi/rtapi_app.cc): \
 	    $(RTAPI_APP_RPATH) \
 	    -o $@ \
 	    $^ \
+	    $(SYSROOT_FLAGS) \
 	    $(LDFLAGS) \
 	    $(LIBUDEV_LIBS) \
 	    $(PROTOBUF_LIBS) $(CZMQ_LIBS) $(LTTNG_UST_LIBS) \
@@ -297,7 +294,7 @@ $(call TOOBJSDEPS, $(RTAPI_MSGD_SRCS)): \
 	../lib/libmachinetalk-pb2++.so
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC)  $(LDFLAGS) -o $@ $^ $(RTAPI_MSGD_LDFLAGS) -lrt $(ZMQ_LIBS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(RTAPI_MSGD_LDFLAGS) -lrt $(ZMQ_LIBS)
 
 USERSRCS += $(RTAPI_MSGD_SRCS)
 TARGETS += ../libexec/rtapi_msgd

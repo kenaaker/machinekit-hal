@@ -18,9 +18,6 @@ $(call TOOBJSDEPS, $(PASM_SRCS)) : EXTRAFLAGS=-Wall -D_UNIX_
 USERSRCS += $(PASM_SRCS)
 TARGETS += $(PASM_HOST)
 
-ifeq ($(CROSS_COMPILING),no)
-PASM := $(PASM_HOST)
-else
 # The PRU assembler for cross-compiling
 PASM_BUILD := ../bin/pasm_build
 PASM := $(PASM_BUILD)
@@ -34,7 +31,6 @@ $(PASM_BUILD): $(call TOOBJS,$(PASM_SRCS),_build)
 
 USERSRCS_BUILD += $(PASM_SRCS)
 TARGETS += $(PASM_BUILD)
-endif
 
 ## basic peek/poke utility
 #DEVMEM2 = ../bin/devmem2

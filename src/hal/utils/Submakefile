@@ -27,9 +27,17 @@ $(LIBHALCMD).0: $(call TOOBJS, $(LIBHALCMDSRCS)) \
 	$(ECHO) Creating shared library $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CC) $(LDFLAGS) \
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) \
 	    -Wl,-soname,$(notdir $@) -shared \
-	    -o $@ $^ -lstdc++ -ldl -lrt $(PROTOBUF_LIBS) $(PROTOCXXLIB) $(CZMQ_LIBS)
+	    -o $@ $^ -lstdc++ -ldl -lrt $(PROTOBUF_LIBS) $(PROTOCXXLIB) $(CZMQ_LIBS) \
+	    -L../lib \
+	    -lhal \
+	    -lhalulapi \
+	    -lrtapi_math \
+	    -lmachinetalk-pb2++ \
+	    -lmkini \
+	    -llinuxcncshm
+
 TARGETS += $(LIBHALCMD) $(LIBHALCMD).0
 
 ../bin/halcmd: $(call TOOBJS, $(HALCMDSRCS))  $(call TOOBJS, $(HALCMDCCSRCS)) \
@@ -41,8 +49,16 @@ TARGETS += $(LIBHALCMD) $(LIBHALCMD).0
 	../lib/librtapi_math.so.0 \
 	$(LIBHALCMD)
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(READLINE_LIBS) \
-	$(PROTOBUF_LIBS) $(CZMQ_LIBS) $(AVAHI_LIBS) -lm -lstdc++
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(READLINE_LIBS) \
+	$(PROTOBUF_LIBS) $(CZMQ_LIBS) $(AVAHI_LIBS) -lm -lstdc++ \
+	-L../lib \
+	-lhal \
+	-lhalulapi \
+	-lrtapi_math \
+	-lmachinetalk-pb2++ \
+	-lmkini \
+	-llinuxcncshm
+	
 TARGETS += ../bin/halcmd
 
 ifdef TARGET_PLATFORM_SOCFPGA
@@ -52,7 +68,7 @@ USERSRCS += $(HM2UTILRCS)
 ../bin/mksocmemio: $(call TOOBJS, $(HM2UTILRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC) $(LDFLAGS) -g -Wall -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -g -Wall -o $@ $^
 TARGETS += ../bin/mksocmemio
 endif
 
@@ -68,7 +84,15 @@ USERSRCS += $(HALMETERSRCS)
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  $(GTK_LIBS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  $(GTK_LIBS) \
+	-L../lib \
+	-lhal \
+	-lhalulapi \
+	-lrtapi_math \
+	-lmachinetalk-pb2++ \
+	-lmkini \
+	-llinuxcncshm
+	
 TARGETS += ../bin/halmeter
 
 HALSCOPESRCS := \
@@ -87,7 +111,15 @@ USERSRCS += $(HALSCOPESRCS)
 		../lib/libhalulapi.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ $(GTK_LIBS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(GTK_LIBS) \
+	-L../lib \
+	-lhal \
+	-lhalulapi \
+	-lrtapi_math \
+	-lmachinetalk-pb2++ \
+	-lmkini \
+	-llinuxcncshm
+	
 TARGETS += ../bin/halscope
 
 HALGTKSRCS := \
@@ -116,7 +148,15 @@ USERSRCS += $(PCIWRITESRCS)
 ../libexec/pci_write: $(call TOOBJS, $(PCIWRITESRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ \
+	-L../lib \
+	-lhal \
+	-lhalulapi \
+	-lrtapi_math \
+	-lmachinetalk-pb2++ \
+	-lmkini \
+	-llinuxcncshm
+	
 TARGETS += ../libexec/pci_write
 
 PCIREADSRCS := hal/utils/pci_read.c hal/utils/upci.c
@@ -125,7 +165,7 @@ USERSRCS += $(PCIREADSRCS)
 ../libexec/pci_read: $(call TOOBJS, $(PCIREADSRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../libexec/pci_read
 
 endif

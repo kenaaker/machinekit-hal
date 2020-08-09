@@ -118,10 +118,11 @@ USERSRCS += $(HALSTREAMERSRCS)
 
 ../bin/halstreamer: \
 		$(call TOOBJS, $(HALSTREAMERSRCS)) \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/halstreamer
 
 HALSAMPLERSRCS := hal/components/sampler_usr.c
@@ -129,10 +130,11 @@ USERSRCS += $(HALSAMPLERSRCS)
 
 ../bin/halsampler: \
 		$(call TOOBJS, $(HALSAMPLERSRCS)) \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/halsampler
 
 # C-language components

@@ -298,7 +298,7 @@ $(NANOPROTOCLIB).0: $(patsubst %.c,objects/%.o,$(NANOPB_LIBSRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CC) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^
 
 
 # C++ bindings library
@@ -308,7 +308,7 @@ $(PROTOCXXLIB).0: $(patsubst %.cc,objects/%.o,$(PROTO_CXX_SRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CXX) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^ \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^ \
 		$(PROTOBUF_LIBS)
 
 # protoc generated headers are exported to ../include

@@ -20,10 +20,13 @@ USERSRCS += $(MB2HAL_SRCS)
 
 # This is how the binaries are linked.
 ../bin/mb2hal: $(call TOOBJS, $(MB2HAL_SRCS)) \
+		../lib/libmachinetalk-pb2++.so.0 \
+		../lib/libhalulapi.so.0 \
+		../lib/liblinuxcncshm.so.0 \
 		../lib/libhal.so.0 \
 		../lib/libmkini.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)@$(CC) $(LDFLAGS) -o $@ $^ $(MB2HAL_LDFLAGS)
+	$(Q)@$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(MB2HAL_LDFLAGS)
 
 TARGETS += ../bin/mb2hal
 

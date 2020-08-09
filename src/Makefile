@@ -1,3 +1,12 @@
+
+CROSS_COMPILE?=arm-linux-gnueabihf-
+SYSTEM_BUILD_ROOT?=/home/kdaaker/nfs_mounts/beaglebone-ai/
+
+export CROSS_COMPILE
+export SYSTEM_BUILD_ROOT
+
+SYSROOT_FLAGS:=--sysroot=$(SYSTEM_BUILD_ROOT)
+
 # see http://www.cmcrossroads.com/ask-mr-make/6535-tracing-rule-execution-in-gnu-make
 # to trace make execution of make in more detail:
 #     make VV=1
@@ -375,7 +384,7 @@ $(sort $(CUSEROBJS)) : objects/%.o: %.c
 	$(ECHO) Compiling $<
 	@mkdir -p $(dir $@)
 	@rm -f $@
-	$(Q)$(CC) -c $(CPPFLAGS) $(CFLAGS) $(EXTRAFLAGS) \
+	$(Q)$(CC) -c $(CPPFLAGS) $(SYSROOT_FLAGS) $(CFLAGS) $(EXTRAFLAGS) \
 		-MP -MD -MF "${@:.o=.d}" -MT "$@" \
 		$< -o $@
 
@@ -392,27 +401,11 @@ $(sort $(CXXUSEROBJS)) : objects/%.o: %.cc
 	$(ECHO) Compiling ++ $<
 	@mkdir -p $(dir $@)
 	@rm -f $@
-	$(Q)$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $(EXTRAFLAGS) \
+	$(Q)$(CXX) -c $(CPPFLAGS) $(SYSROOT_FLAGS) $(CXXFLAGS) $(EXTRAFLAGS) \
 		-MP -MD -MF "${@:.o=.d}" -MT "$@" \
 		$< -o $@
 
-ifeq ($(TRIVIAL_BUILD),no)
-configure: configure.ac
-	./autogen.sh
-
-config.h.in: configure.ac
-	./autogen.sh
-
-config.status: configure
-	if [ -f config.status ]; then ./config.status --recheck; else \
-	    echo 1>&2 "*** machinekit is not configured.	Run './configure' with appropriate flags."; \
-	    exit 1; \
-	fi
-endif
-
-Makefile: config.h
-config.h: config.h.in config.status
-	@./config.status -q --header=$@
+Makefile:
 
 INFILES = \
 	../scripts/realtime \
@@ -422,10 +415,7 @@ INFILES = \
 	../scripts/halrun \
 	../scripts/rip-environment
 
-$(INFILES): %: %.in config.status
-	@./config.status --file=$@
-
-default: $(INFILES)
+default:
 
 # For each file to be copied to ../include, its location in the source tree
 # is listed here.  Note that due to $(INCLUDE), defined above, the include
@@ -879,14 +869,14 @@ $(RTLIBDIR)/%.so:
 	$(Q)$(OBJCOPY) -j .rtapi_export -O binary $(OBJDIR)/$*.tmp $(OBJDIR)/$*.exported
 	$(Q)(echo '{ global : ';  tr -s '\0' <$(OBJDIR)/$*.exported | xargs -r0 printf '%s;\n' | grep .; echo 'local : * ; };') > $(OBJDIR)/$*.ver
 	@# link the final object using this version script:
-	$(Q)$(CC) -shared -Bsymbolic $(LDFLAGS) -Wl,--version-script,$(OBJDIR)/$*.ver -o $@ $^ $(EXTRA_LDFLAGS)
+	$(Q)$(CC) -shared -Bsymbolic $(LDFLAGS) $(SYSROOT_FLAGS) -Wl,--version-script,$(OBJDIR)/$*.ver -o $@ $^ $(EXTRA_LDFLAGS)
 
 $(sort $(RTDEPS)): $(DEPDIR)/%.d: %.c
 	@mkdir -p $(dir $@)
 	$(ECHO) Depending realtime $<
 	$(Q)$(call DEP,$(CC),$@ \
 		$(patsubst depends/%.d,objects/%.o,$@),$@,$(OPT) \
-		$(DEBUG) $(CPPFLAGS) $(EXTRA_CFLAGS) $<)
+		$(DEBUG) $(CPPFLAGS) $(SYSROOT_FLAGS) $(EXTRA_CFLAGS) $<)
 
 # Rules to make .o (object) files
 $(sort $(RTOBJS)) : $(OBJDIR)/%.o : %.c $(DEPDIR)/%.d
@@ -894,7 +884,7 @@ $(sort $(RTOBJS)) : $(OBJDIR)/%.o : %.c $(DEPDIR)/%.d
 	@rm -f $@
 	@mkdir -p $(dir $@)
 	$(Q)$(CC) -c $(OPT) $(DPKG_CFLAGS) $(DEBUG) $(CPPFLAGS) \
-	    $(EXTRA_CFLAGS) $< -o $@
+	    $(SYSROOT_FLAGS) $(EXTRA_CFLAGS) $< -o $@
 
 # Rules to make .o (object) files from .cc
 $(sort $(CXXRTOBJS)) : $(OBJDIR)/%.o : %.cc $(DEPDIR)/%.d
@@ -902,7 +892,7 @@ $(sort $(CXXRTOBJS)) : $(OBJDIR)/%.o : %.cc $(DEPDIR)/%.d
 	@rm -f $@
 	@mkdir -p $(dir $@)
 	$(Q)$(CXX) -c $(OPT) $(DEBUG) $(RT_CXXFLAGS) $(CPPFLAGS) \
-	    $(EXTRA_CFLAGS) $< -o $@
+	    $(SYSROOT_FLAGS) $(EXTRA_CFLAGS) $< -o $@
 
 ###############################################################################################
 

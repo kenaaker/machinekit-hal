@@ -58,7 +58,7 @@ TARGETS += ../lib/libmtalk.so ../lib/libmtalk.so.0
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CXX) $(LDFLAGS) -g  -Wl,-soname,$(notdir $@) -shared -o $@ $^ \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) -g  -Wl,-soname,$(notdir $@) -shared -o $@ $^ \
 	$(AVAHI_LIBS) $(CZMQ_LIBS) $(LIBMTALK_LDFLAGS) \
 	$(PB2JSONLIB_LDFLAGS)  $(LIBBACKTRACE)
 
@@ -82,7 +82,7 @@ $(call TOOBJSDEPS, $(ZRES_SRCS)) : EXTRAFLAGS += -g -std=c++0x $(AVAHI_CFLAGS)
 	../lib/libmachinetalk-pb2++.so \
 	../lib/libmkini.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^  $(AVAHI_LIBS) -lstdc++
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  $(AVAHI_LIBS) -lstdc++
 
 USERSRCS += $(ZRES_SRCS)
 TARGETS += ../bin/zres
