@@ -70,186 +70,186 @@ static const char *inifile;
 static FILE *inifp;
 extern char *logpath;
 /***********************************************************************
-*                   LOCAL FUNCTION DEFINITIONS                         *
-************************************************************************/
+ *                   LOCAL FUNCTION DEFINITIONS                         *
+ ************************************************************************/
 
-void cleanup(char *uuid_ptr)
-{
-    if(uuid_ptr != NULL)
+void cleanup(char *uuid_ptr) {
+    if (uuid_ptr != NULL)
         free(uuid_ptr);
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     int c, fd;
     int keep_going, retval, errorcount;
     int filemode = 0;
     char *filename = NULL;
     FILE *srcfile = NULL;
-    char raw_buf[MAX_CMD_LEN+1];
+    char raw_buf[MAX_CMD_LEN + 1];
     int linenumber = 1;
-    char *cf=NULL, *cw=NULL, *cl=NULL;
-    char *uri = NULL; // NULL - use service discovery
+    char *cf = NULL, *cw = NULL, *cl = NULL;
+    char *uri = NULL;          // NULL - use service discovery
     char *service_uuid = NULL; // must have a global uuid
     int strdupped_uuid = 0;
 
     inifile = getenv("MACHINEKIT_INI");
     /* use default if not specified by user */
     if (inifile == NULL) {
-	inifile = MACHINEKIT_INI;
+        inifile = MACHINEKIT_INI;
     }
 
     if (argc < 2) {
-	/* no args specified, print help */
-	print_help_general(0);
-	exit(0);
+        /* no args specified, print help */
+        print_help_general(0);
+        exit(0);
     }
     /* set default level of output - 'quiet' */
     rtapi_set_msg_level(RTAPI_MSG_ERR);
     /* set default for other options */
     keep_going = 0;
     /* start parsing the command line, options first */
-    while(1) {
+    while (1) {
         c = getopt(argc, argv, "+RCfi:kqQsvVhu:U:P");
-        if(c == -1) break;
-        switch(c) {
-            case 'R':
-       		/* force an unlock of the HAL mutex - to be used after a segfault in a hal program */
-		if (release_HAL_mutex() < 0) {
-			printf("HALCMD: Release Mutex failed!\n");
-			return 1;
-		}
-		return 0;
-		break;
-	    case 'h':
-		/* -h = help */
-                if (argc > optind) { /* there are more arguments */
-                    do_help_cmd(argv[optind]);
-                } else {
-		    print_help_general(1);
-                }
-		return 0;
-		break;
-	    case 'k':
-		/* -k = keep going */
-		keep_going = 1;
-		break;
-	    case 'q':
-		/* -q = quiet (default) */
-		rtapi_set_msg_level(RTAPI_MSG_ERR);
-		break;
-	    case 'Q':
-		/* -Q = very quiet */
-		rtapi_set_msg_level(RTAPI_MSG_NONE);
-		break;
-	    case 's':
-		/* script friendly mode */
-		scriptmode = 1;
-		break;
-	    case 'v':
-		/* -v = verbose */
-		rtapi_set_msg_level(RTAPI_MSG_INFO);
-		break;
-	    case 'V':
-		/* -V = very verbose */
-		rtapi_set_msg_level(RTAPI_MSG_ALL);
-		break;
-	    case 'e':
-                echo_mode = 1;
-		break;
-	    case 'f':
-                filemode = 1;
-		break;
-	    case 'P':
-                proto_debug = 1;
-		break;
-	    case 'C':
-		// Coverity doesn't like this and you can see why
-		// not going to mess with it for now
-                cl = getenv("COMP_LINE");
-                cw = getenv("COMP_POINT");
-                if (!cl || !cw) exit(0);
-                c = atoi(cw)-strlen(argv[0])-1;
-                if (c<0) c=0;
-                cl += strlen(argv[0])+1;
-                if (c>0 && cl[c]=='\0') c--;    // if at end of line, back up one char
-                cf=&cl[c];
-                {
-                    int n;
-                    for (n=c; n>0; n--, cf--) {
-                        if (isspace(*cf) || *cf == '=' || *cf == '<' || *cf == '>') {
-                            cf++;
-                            break;
-                        }
-                    }
-                    halcmd_startup_uuid(1, uri, service_uuid);
-                    propose_completion(cl, cf, n);
-                }
-                if (comp_id >= 0){
-                    if(strdupped_uuid)
-                        cleanup(service_uuid);
-                    halcmd_shutdown();
-                }
+        if (c == -1)
+            break;
+        switch (c) {
+        case 'R':
+            /* force an unlock of the HAL mutex - to be used after a segfault in a hal program */
+            if (release_HAL_mutex() < 0) {
+                printf("HALCMD: Release Mutex failed!\n");
+                return 1;
+            }
+            return 0;
+            break;
+        case 'h':
+            /* -h = help */
+            if (argc > optind) { /* there are more arguments */
+                do_help_cmd(argv[optind]);
+            } else {
+                print_help_general(1);
+            }
+            return 0;
+            break;
+        case 'k':
+            /* -k = keep going */
+            keep_going = 1;
+            break;
+        case 'q':
+            /* -q = quiet (default) */
+            rtapi_set_msg_level(RTAPI_MSG_ERR);
+            break;
+        case 'Q':
+            /* -Q = very quiet */
+            rtapi_set_msg_level(RTAPI_MSG_NONE);
+            break;
+        case 's':
+            /* script friendly mode */
+            scriptmode = 1;
+            break;
+        case 'v':
+            /* -v = verbose */
+            rtapi_set_msg_level(RTAPI_MSG_INFO);
+            break;
+        case 'V':
+            /* -V = very verbose */
+            rtapi_set_msg_level(RTAPI_MSG_ALL);
+            break;
+        case 'e':
+            echo_mode = 1;
+            break;
+        case 'f':
+            filemode = 1;
+            break;
+        case 'P':
+            proto_debug = 1;
+            break;
+        case 'C':
+            // Coverity doesn't like this and you can see why
+            // not going to mess with it for now
+            cl = getenv("COMP_LINE");
+            cw = getenv("COMP_POINT");
+            if (!cl || !cw)
                 exit(0);
-                break;
-#ifndef NO_INI
-	    case 'i':
-		/* -i = allow reading 'setp' values from an ini file */
-		if (halcmd_inifile == NULL) {
-		    /* it's the first -i (ignore repeats) */
-                    /* there is a following arg, and it's not an option */
-                    filename = optarg;
-                    halcmd_inifile = fopen(filename, "r");
-                    if (halcmd_inifile == NULL) {
-                        fprintf(stderr,
-                            "Could not open ini file '%s'\n",
-                            filename);
-                        exit(-1);
+            c = atoi(cw) - strlen(argv[0]) - 1;
+            if (c < 0)
+                c = 0;
+            cl += strlen(argv[0]) + 1;
+            if (c > 0 && cl[c] == '\0')
+                c--; // if at end of line, back up one char
+            cf = &cl[c];
+            {
+                int n;
+                for (n = c; n > 0; n--, cf--) {
+                    if (isspace(*cf) || *cf == '=' || *cf == '<' || *cf == '>') {
+                        cf++;
+                        break;
                     }
-                    /* make sure file is closed on exec() */
-                    fd = fileno(halcmd_inifile);
-                    fcntl(fd, F_SETFD, FD_CLOEXEC);
-		}
-		break;
+                }
+                halcmd_startup_uuid(1, uri, service_uuid);
+                propose_completion(cl, cf, n);
+            }
+            if (comp_id >= 0) {
+                if (strdupped_uuid)
+                    cleanup(service_uuid);
+                halcmd_shutdown();
+            }
+            exit(0);
+            break;
+#ifndef NO_INI
+        case 'i':
+            /* -i = allow reading 'setp' values from an ini file */
+            if (halcmd_inifile == NULL) {
+                /* it's the first -i (ignore repeats) */
+                /* there is a following arg, and it's not an option */
+                filename = optarg;
+                halcmd_inifile = fopen(filename, "r");
+                if (halcmd_inifile == NULL) {
+                    fprintf(stderr, "Could not open ini file '%s'\n", filename);
+                    exit(-1);
+                }
+                /* make sure file is closed on exec() */
+                fd = fileno(halcmd_inifile);
+                fcntl(fd, F_SETFD, FD_CLOEXEC);
+            }
+            break;
 #endif /* NO_INI */
-	    case 'u':
-		uri = optarg;
-		break;
-	    case 'U':
-                service_uuid = optarg;
-		break;
-	    case '?':
-		/* option not in getopt() list
-		   getopt already printed an error message */
-		exit(-1);
-		break;
-	    default:
-		/* option in getopt list but not in switch statement - bug */
-		printf("Unimplemented option '-%c'\n", c);
-		exit(-1);
-		break;
+        case 'u':
+            uri = optarg;
+            break;
+        case 'U':
+            service_uuid = optarg;
+            break;
+        case '?':
+            /* option not in getopt() list
+               getopt already printed an error message */
+            exit(-1);
+            break;
+        default:
+            /* option in getopt list but not in switch statement - bug */
+            printf("Unimplemented option '-%c'\n", c);
+            exit(-1);
+            break;
         }
     }
 
-    if (inifile && ((inifp = fopen(inifile,"r")) == NULL)) {
-	fprintf(stderr,"halcmd: cant open inifile '%s'\n", inifile);
+    if (inifile && ((inifp = fopen(inifile, "r")) == NULL)) {
+        fprintf(stderr, "halcmd: cant open inifile '%s'\n", inifile);
     }
     // must have a MKUUID - commandline may override
     if (service_uuid == NULL) {
-	const char *s;
-	if ((s = iniFind(inifp, "MKUUID", "MACHINEKIT"))) {
-	    // this was not freed anywhere
-    	    service_uuid = strdup(s);
-    	    // set flag so we know to use cleanup()
-    	    strdupped_uuid = 1;
-	}
+        const char *s;
+        if ((s = iniFind(inifp, "MKUUID", "MACHINEKIT"))) {
+            // this was not freed anywhere
+            service_uuid = strdup(s);
+            // set flag so we know to use cleanup()
+            strdupped_uuid = 1;
+        }
     }
     if (service_uuid == NULL) {
-	fprintf(stderr, "halcmd: no service UUID (-R <uuid> or MACHINEKIT_INI [GLOBAL]MKUUID) present\n");
-	exit(-1);
+        fprintf(stderr, "halcmd: no service UUID (-R <uuid> or MACHINEKIT_INI [GLOBAL]MKUUID) present\n");
+        exit(-1);
     }
 
-    if(filemode) {
+    if (filemode) {
         /* it's the first -f (ignore repeats) */
         if (argc > optind) {
             /* there is a following arg, and it's not an option */
@@ -257,9 +257,7 @@ int main(int argc, char **argv)
             srcfile = fopen(filename, "r");
             halcmd_set_filename(filename);
             if (srcfile == NULL) {
-                fprintf(stderr,
-                    "Could not open command file '%s'\n",
-                    filename);
+                fprintf(stderr, "Could not open command file '%s'\n", filename);
                 exit(-1);
             }
             /* make sure file is closed on exec() */
@@ -273,39 +271,38 @@ int main(int argc, char **argv)
         }
     }
 
-    if ( halcmd_startup_uuid(0, uri, service_uuid) != 0 ){
-        if(strdupped_uuid)
+    if (halcmd_startup_uuid(0, uri, service_uuid) != 0) {
+        if (strdupped_uuid)
             cleanup(service_uuid);
         return 1;
     }
     {
-	char cmdline[MAX_CMD_LEN];
-	cmdline[0] = '\0';
-	int i, len = 0;
-	for (i=1; i < argc; i++) {
-	    len += strlen(argv[i]) + 1;
-	    if (len < MAX_CMD_LEN) {
-		strcat(cmdline, argv[i]);
-		strcat(cmdline, " ");
-	    }
-	    else {
-		fprintf(stderr, "halcmd commandline exceeds %i chars", MAX_CMD_LEN);
-		exit(-1);
-	    }
-	}
-	rtapi_print_msg(RTAPI_MSG_DBG, "--halcmd %s", cmdline);
+        char cmdline[MAX_CMD_LEN];
+        cmdline[0] = '\0';
+        int i, len = 0;
+        for (i = 1; i < argc; i++) {
+            len += strlen(argv[i]) + 1;
+            if (len < MAX_CMD_LEN) {
+                strcat(cmdline, argv[i]);
+                strcat(cmdline, " ");
+            } else {
+                fprintf(stderr, "halcmd commandline exceeds %i chars", MAX_CMD_LEN);
+                exit(-1);
+            }
+        }
+        rtapi_print_msg(RTAPI_MSG_DBG, "--halcmd %s", cmdline);
     }
 
     errorcount = 0;
     /* HAL init is OK, let's process the command(s) */
     if (srcfile == NULL) {
 #ifndef NO_INI
-        if(halcmd_inifile) {
+        if (halcmd_inifile) {
             fprintf(stderr, "-i may only be used together with -f\n");
             errorcount++;
         }
 #endif
-        if(errorcount == 0 && argc > optind) {
+        if (errorcount == 0 && argc > optind) {
             halcmd_set_filename("<commandline>");
             halcmd_set_linenumber(0);
             retval = halcmd_parse_cmd(&argv[optind]);
@@ -316,36 +313,35 @@ int main(int argc, char **argv)
     } else {
         /* read command line(s) from 'srcfile' */
         while (1) {
-            char *tokens[MAX_TOK+1];
+            char *tokens[MAX_TOK + 1];
             halcmd_set_linenumber(linenumber++);
             if (!get_input(srcfile, raw_buf, MAX_CMD_LEN)) {
                 break;
             }
             /* remove comments, do var substitution, and tokenise */
             retval = halcmd_preprocess_line(raw_buf, tokens);
-            if (echo_mode) { 
+            if (echo_mode) {
                 halcmd_echo("%s\n", raw_buf);
             }
             if (retval == 0) {
                 /* the "quit" command is not handled by parse_line() */
-                if ( ( strcasecmp(tokens[0],"quit") == 0 ) ||
-                     ( strcasecmp(tokens[0],"exit") == 0 ) ) {
+                if ((strcasecmp(tokens[0], "quit") == 0) || (strcasecmp(tokens[0], "exit") == 0)) {
                     break;
                 }
                 /* process command */
                 retval = halcmd_parse_cmd(tokens);
             }
             /* did a signal happen while we were busy? */
-            if ( halcmd_done ) {
+            if (halcmd_done) {
                 /* treat it as an error */
                 errorcount++;
                 /* exit from loop */
                 break;
             }
-            if ( retval != 0 ) {
+            if (retval != 0) {
                 errorcount++;
             }
-            if (( errorcount > 0 ) && ( keep_going == 0 )) {
+            if ((errorcount > 0) && (keep_going == 0)) {
                 /* exit from loop */
                 break;
             }
@@ -353,24 +349,22 @@ int main(int argc, char **argv)
     }
     /* all done */
     if (!scriptmode && srcfile == stdin && isatty(0)) {
-	halcmd_save_history();
+        halcmd_save_history();
     }
-    if(strdupped_uuid)
+    if (strdupped_uuid)
         cleanup(service_uuid);
     halcmd_shutdown();
-    if ( errorcount > 0 ) {
-	return 1;
+    if (errorcount > 0) {
+        return 1;
     } else {
-	return 0;
+        return 0;
     }
-
 }
 
 /* release_HAL_mutex() unconditionally releases the hal_mutex
    very useful after a program segfaults while holding the mutex
 */
-static int release_HAL_mutex(void)
-{
+static int release_HAL_mutex(void) {
     int comp_id, mem_id, retval;
     void *mem;
     hal_data_t *hal_data;
@@ -384,21 +378,19 @@ static int release_HAL_mutex(void)
     /* get HAL shared memory block from RTAPI */
     mem_id = rtapi_shmem_new(HAL_KEY, comp_id, global_data->hal_size);
     if (mem_id < 0) {
-        rtapi_print_msg(RTAPI_MSG_ERR,
-            "ERROR: could not open shared memory\n");
+        rtapi_print_msg(RTAPI_MSG_ERR, "ERROR: could not open shared memory\n");
         rtapi_exit(comp_id);
         return -EINVAL;
     }
     /* get address of shared memory area */
     retval = rtapi_shmem_getptr(mem_id, &mem);
     if (retval < 0) {
-        rtapi_print_msg(RTAPI_MSG_ERR,
-            "ERROR: could not access shared memory\n");
+        rtapi_print_msg(RTAPI_MSG_ERR, "ERROR: could not access shared memory\n");
         rtapi_exit(comp_id);
         return -EINVAL;
     }
     /* set up internal pointers to shared mem and data structure */
-    hal_data = (hal_data_t *) mem;
+    hal_data = (hal_data_t *)mem;
     /* release mutex  */
     rtapi_mutex_give(&(hal_data->mutex));
     /* release RTAPI resources */
@@ -406,7 +398,6 @@ static int release_HAL_mutex(void)
     rtapi_exit(comp_id);
     /* done */
     return 0;
-
 }
 
 static char **completion_callback(const char *text, hal_generator_func cb) {
@@ -414,24 +405,27 @@ static char **completion_callback(const char *text, hal_generator_func cb) {
     char *s = 0;
     do {
         s = cb(text, state);
-        if(s) printf("%s\n", s);
+        if (s)
+            printf("%s\n", s);
         state = 1;
-    } while(s);
+    } while (s);
     return NULL;
 }
 
 /* completion text starts with "halcmd", so remove that from the string */
 static int propose_completion(char *all, char *fragment, int start) {
-    int sp=0, len=strlen(all), i=0;
-    for(; i<len; i++) if(all[i] == ' ') sp = i;
-    if(sp) sp++;
+    int sp = 0, len = strlen(all), i = 0;
+    for (; i < len; i++)
+        if (all[i] == ' ')
+            sp = i;
+    if (sp)
+        sp++;
     len = strlen(all);
     halcmd_completer(fragment, sp, len, completion_callback, all);
     return 0;
 }
 
-static void print_help_general(int showR)
-{
+static void print_help_general(int showR) {
     printf("\nUsage:   halcmd [options] [cmd [args]]\n\n");
     printf("\n         halcmd [options] -f [filename]\n\n");
     printf("options:\n\n");
@@ -447,7 +441,7 @@ static void print_help_general(int showR)
     printf("  -q             Quiet - print errors only (default).\n");
     printf("  -Q             Very quiet - print nothing.\n");
     if (showR != 0) {
-    printf("  -R             Release mutex (for crash recovery only).\n");
+        printf("  -R             Release mutex (for crash recovery only).\n");
     }
     printf("  -s             Script friendly - don't print headers on output.\n");
     printf("  -v             Verbose - print result of every command.\n");
@@ -461,16 +455,14 @@ static void print_help_general(int showR)
     printf("  help command   Prints detailed help for 'command'\n\n");
 }
 
-static int halcmd_fgets_notrunc(char *s, int size, FILE *stream)
-{
+static int halcmd_fgets_notrunc(char *s, int size, FILE *stream) {
     char lastchar;
 
     if (fgets(s, size, stream) == NULL)
         return 0;
     lastchar = s[strlen(s) - 1];
     if (lastchar != '\n' && lastchar != '\r' && !feof(stream)) {
-        halcmd_error("The hal file command line is too long (>=%d).\n",
-                     size - 1);
+        halcmd_error("The hal file command line is too long (>=%d).\n", size - 1);
         exit(1); /* line too long. Do not truncate. */
     }
     return 1;
@@ -483,8 +475,8 @@ static int get_input(FILE *srcfile, char *buf, size_t bufsize) {
     static int first_time = 1;
     char *rlbuf;
 
-    if(!scriptmode && srcfile == stdin && isatty(0)) {
-        if(first_time) {
+    if (!scriptmode && srcfile == stdin && isatty(0)) {
+        if (first_time) {
             halcmd_init_readline();
             first_time = 0;
         }
@@ -492,12 +484,11 @@ static int get_input(FILE *srcfile, char *buf, size_t bufsize) {
         if (!rlbuf)
             return 0;
         if (strlen(rlbuf) >= bufsize) {
-            halcmd_error("The hal command line is too long (>=%d).\n",
-                         (int)bufsize);
+            halcmd_error("The hal command line is too long (>=%d).\n", (int)bufsize);
             return 0; /* line too long. Do not truncate. */
         }
         strncpy(buf, rlbuf, bufsize);
-        buf[bufsize-1] = 0;
+        buf[bufsize - 1] = 0;
         free(rlbuf);
 
         if (*buf)
@@ -505,15 +496,17 @@ static int get_input(FILE *srcfile, char *buf, size_t bufsize) {
 
         return 1;
     }
-    if(prompt_mode) {
-	    fprintf(stdout, scriptmode ? "%%\n" : "halcmd: "); fflush(stdout);
+    if (prompt_mode) {
+        fprintf(stdout, scriptmode ? "%%\n" : "halcmd: ");
+        fflush(stdout);
     }
     return halcmd_fgets_notrunc(buf, bufsize, srcfile);
 }
 #else
 static int get_input(FILE *srcfile, char *buf, size_t bufsize) {
-    if(prompt_mode) {
-	    fprintf(stdout, scriptmode ? "%%\n" : "halcmd: "); fflush(stdout);
+    if (prompt_mode) {
+        fprintf(stdout, scriptmode ? "%%\n" : "halcmd: ");
+        fflush(stdout);
     }
     return halcmd_fgets_notrunc(buf, bufsize, srcfile);
 }
@@ -544,7 +537,8 @@ void halcmd_error(const char *format, ...) {
 
 void halcmd_info(const char *format, ...) {
     va_list ap;
-    if(rtapi_get_msg_level() < RTAPI_MSG_INFO) return;
+    if (rtapi_get_msg_level() < RTAPI_MSG_INFO)
+        return;
     fprintf(stderr, "%s:%d: ", halcmd_get_filename(), halcmd_get_linenumber());
     va_start(ap, format);
     vfprintf(stderr, format, ap);
