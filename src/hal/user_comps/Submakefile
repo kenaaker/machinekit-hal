@@ -26,13 +26,14 @@ USER_COMP_BINS := $(patsubst hal/user_comps/%.comp, ../bin/%, $(USER_COMP_COMPS)
 		../lib/libhalulapi.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) "Preprocessing usercomp $(notdir $<)"
-	@mkdir -p objects/hal/user_comps
+	mkdir -p objects/hal/user_comps
 	$(Q)../bin/comp -o $(patsubst  hal/user_comps/%.comp, objects/hal/user_comps/%.c, $<) $<
 	$(ECHO) "Compiling usercomp $(notdir $<)"
-	$(Q)$(CC) -DULAPI $(INCLUDE) -o $@ $(LDFLAGS) \
+	$(Q)$(CC) $(SYSROOT_FLAGS) -DULAPI $(INCLUDE) -o $@ $(LDFLAGS) \
 		$(patsubst  hal/user_comps/%.comp, objects/hal/user_comps/%.c, $<) \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/librtapi_math.so.0
 
 TARGETS +=  $(USER_COMP_BINS)
@@ -48,9 +49,10 @@ $(call TOOBJSDEPS, $(MODBUSSRCS)) : EXTRAFLAGS += $(MODBUSCCFLAGS)
 ../bin/gs2_vfd: \
 		$(call TOOBJS, $(MODBUSSRCS)) \
 		../lib/libhal.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) -o $@ $^ $(LDFLAGS) $(MODBUSLDFLAGS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) -o  $@ $^ $(LDFLAGS) $(MODBUSLDFLAGS)
 TARGETS += ../bin/gs2_vfd
 endif # HAVE_LIBMODBUS
 
@@ -60,9 +62,10 @@ USERSRCS += $(SHUTTLEXPRESS_SRC)
 ../bin/shuttlexpress: \
 		$(call TOOBJS, $(SHUTTLEXPRESS_SRC)) \
 		../lib/libhal.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/shuttlexpress
 endif
 
@@ -75,12 +78,12 @@ $(call TOOBJSDEPS, $(XHC_HB04_SRC)) : EXTRAFLAGS += $(LIBUSB10_CFLAGS)
 		$(call TOOBJS, $(XHC_HB04_SRC)) \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libmkini.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^ -lstdc++ $(LIBUSB10_LIBS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ -lstdc++ $(LIBUSB10_LIBS)
 TARGETS += ../bin/xhc-hb04
-
 endif # HAVE_LIBUSB10
 
 ../include/%.h: ./hal/user_comps/%.h
