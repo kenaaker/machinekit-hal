@@ -28,7 +28,7 @@ USERSRCS += $(MB2HAL_SRCS)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libmkini.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)@$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(MB2HAL_LDFLAGS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(MB2HAL_LDFLAGS)
 
 TARGETS += ../bin/mb2hal
 

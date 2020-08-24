@@ -245,7 +245,7 @@ $(call TOOBJSDEPS, rtapi/rtapi_app.cc): \
 	../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CXX) -Wl,--no-as-needed \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) -Wl,--no-as-needed \
 	    -Wl,-rpath,$(HAL_RTLIB_DIR) \
 	    $(RTAPI_APP_RPATH) \
 	    -o $@ \

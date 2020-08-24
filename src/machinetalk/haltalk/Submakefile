@@ -32,7 +32,7 @@ $(call TOOBJSDEPS, $(HALTALK_SRCS)) : EXTRAFLAGS += $(HALTALK_CXXFLAGS)
 	../lib/libhalulapi.so.0 \
 	../lib/libmkini.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) -o $@ $^ $(SYSROOT_FLAGS) $(LDFLAGS) $(HALTALK_LDFLAGS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) -o $@ $^ $(LDFLAGS) $(HALTALK_LDFLAGS)
 
 USERSRCS += $(HALTALK_SRCS)
 TARGETS += ../bin/haltalk

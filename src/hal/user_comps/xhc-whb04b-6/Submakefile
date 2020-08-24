@@ -41,15 +41,8 @@ usb.o usb.d : usb.c usb.h $(XHC_WHB04B6_LIB_DEPENDENCIES)
 USERSRCS += $(XHC_WHB04B6_SRC)
 ../bin/xhc-whb04b-6 xhc-whb04b-6.d : $(call TOOBJS, $(XHC_WHB04B6_SRC)) $(XHC_WHB04B6_LIB_DEPENDENCIES)
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) $(XHC_WHB04B6_LIBS) -o $@ $^ \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
-	
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) $(XHC_WHB04B6_LIBS) -o $@ $^
+
 TARGETS += ../bin/xhc-whb04b-6
 
 endif # HAVE_LIBUSB10

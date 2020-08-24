@@ -52,14 +52,7 @@ $(call TOOBJSDEPS, $(MODBUSSRCS)) : EXTRAFLAGS += $(MODBUSCCFLAGS)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) -o $@ $^ $(LDFLAGS) $(MODBUSLDFLAGS) \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
+	$(Q)$(CC) $(SYSROOT_FLAGS) -o  $@ $^ $(LDFLAGS) $(MODBUSLDFLAGS)
 TARGETS += ../bin/gs2_vfd
 endif # HAVE_LIBMODBUS
 
@@ -72,14 +65,7 @@ USERSRCS += $(SHUTTLEXPRESS_SRC)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/shuttlexpress
 endif
 
@@ -96,14 +82,7 @@ $(call TOOBJSDEPS, $(XHC_HB04_SRC)) : EXTRAFLAGS += $(LIBUSB10_CFLAGS)
 		../lib/libmkini.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ -lstdc++ $(LIBUSB10_LIBS) \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ -lstdc++ $(LIBUSB10_LIBS)
 TARGETS += ../bin/xhc-hb04
 endif # HAVE_LIBUSB10
 

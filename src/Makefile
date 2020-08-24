@@ -1,11 +1,11 @@
 
-CROSS_COMPILE?=arm-linux-gnueabihf-
-SYSTEM_BUILD_ROOT?=/home/kdaaker/nfs_mounts/beaglebone-ai/
-
+CROSS_COMPILE ?= arm-linux-gnueabihf-
 export CROSS_COMPILE
+SYSTEM_BUILD_ROOT ?= /home/kdaaker/nfsmounts/beaglebone-ai
+SYSROOT_FLAGS ?= --sysroot=$(SYSTEM_BUILD_ROOT)
 export SYSTEM_BUILD_ROOT
+export SYSROOT_FLAGS
 
-SYSROOT_FLAGS:=--sysroot=$(SYSTEM_BUILD_ROOT)
 
 # see http://www.cmcrossroads.com/ask-mr-make/6535-tracing-rule-execution-in-gnu-make
 # to trace make execution of make in more detail:
@@ -380,28 +380,28 @@ endif
 LDFLAGS += -Wl,--no-as-needed
 
 # Rules to make .o (object) files
-$(sort $(CUSEROBJS)) : objects/%.o: %.c
+$(CUSEROBJS): objects/%.o: %.c
 	$(ECHO) Compiling $<
-	@mkdir -p $(dir $@)
-	@rm -f $@
-	$(Q)$(CC) -c $(CPPFLAGS) $(SYSROOT_FLAGS) $(CFLAGS) $(EXTRAFLAGS) \
+	mkdir -p $(dir $@)
+	rm -f $@
+	$(Q)$(CC) $(SYSROOT_FLAGS) -c $(CPPFLAGS) $(CFLAGS) $(EXTRAFLAGS) \
 		-MP -MD -MF "${@:.o=.d}" -MT "$@" \
 		$< -o $@
 
 # Rules to make .o (object) files, build arch
-$(sort $(CUSEROBJS_BUILD)) : objects/%_build.o: %.c
+$(CUSEROBJS_BUILD): objects/%_build.o: %.c
 	$(ECHO) Compiling $<
-	@mkdir -p $(dir $@)
-	@rm -f $@
+	mkdir -p $(dir $@)
+	rm -f $@
 	$(Q)$(CC_FOR_BUILD) -c $(CFLAGS) $(EXTRAFLAGS) \
 		-MP -MD -MF "${@:.o=.d}" -MT "$@" \
 		$< -o $@
 
-$(sort $(CXXUSEROBJS)) : objects/%.o: %.cc
+$(CXXUSEROBJS): objects/%.o: %.cc
 	$(ECHO) Compiling ++ $<
-	@mkdir -p $(dir $@)
-	@rm -f $@
-	$(Q)$(CXX) -c $(CPPFLAGS) $(SYSROOT_FLAGS) $(CXXFLAGS) $(EXTRAFLAGS) \
+	mkdir -p $(dir $@)
+	rm -f $@
+	$(Q)$(CXX) $(SYSROOT_FLAGS) -c$(CPPFLAGS) $(CXXFLAGS) $(EXTRAFLAGS) \
 		-MP -MD -MF "${@:.o=.d}" -MT "$@" \
 		$< -o $@
 
@@ -546,7 +546,9 @@ userspace: $(TARGETS)
 ifeq ($(BUILD_PYTHON),yes)
 pythonclean:
 	rm -f $(PYTARGETS)
-	find ../lib/python -name '*.so' -exec rm {} +
+	if [ -d ../lib/python ]; then \
+		find ../lib/python -name '*.so' -exec rm {} + ; \
+	fi
 python: $(PYTARGETS)
 userspace: python
 clean: pythonclean cscopeclean
@@ -849,7 +851,7 @@ RTDEPS := $(sort $(patsubst $(OBJDIR)/%.o,$(DEPDIR)/%.d, $(RTOBJS)))
 
 modules:
 ifeq ($(RUN_IN_PLACE)+$(BUILD_DRIVERS),yes+yes)
-	@test -f ../libexec/rtapi_app -a \
+	test -f ../libexec/rtapi_app -a \
 	    \( 0`stat -c %u ../libexec/rtapi_app 2>/dev/null` \
 			-ne 0 -o ! -u ../libexec/rtapi_app \) \
 		&& need_setuid=1; \
@@ -861,15 +863,15 @@ endif
 modules: $(patsubst %.o,$(RTLIBDIR)/%.so,$(obj-m))
 $(RTLIBDIR)/%.so:
 	$(ECHO) Linking realtime $(notdir $@)
-	@mkdir -p $(dir $@)
-	@# link all objects files into a single .so
+	mkdir -p $(dir $@)
+	# link all objects files into a single .so
 	$(Q)$(LD) -d -r -o $(OBJDIR)/$*.tmp $^
-	@# use the .rtapi_export string table to generate a ld version script
-	@# explicitly defining the EXPORT_SYMBOL syms as global, and everything else as local:
+	# use the .rtapi_export string table to generate a ld version script
+	# explicitly defining the EXPORT_SYMBOL syms as global, and everything else as local:
 	$(Q)$(OBJCOPY) -j .rtapi_export -O binary $(OBJDIR)/$*.tmp $(OBJDIR)/$*.exported
 	$(Q)(echo '{ global : ';  tr -s '\0' <$(OBJDIR)/$*.exported | xargs -r0 printf '%s;\n' | grep .; echo 'local : * ; };') > $(OBJDIR)/$*.ver
-	@# link the final object using this version script:
-	$(Q)$(CC) -shared -Bsymbolic $(LDFLAGS) $(SYSROOT_FLAGS) -Wl,--version-script,$(OBJDIR)/$*.ver -o $@ $^ $(EXTRA_LDFLAGS)
+	# link the final object using this version script:
+	$(Q)$(CC) $(SYSROOT_FLAGS) -shared -Bsymbolic $(LDFLAGS) -Wl,--version-script,$(OBJDIR)/$*.ver -o $@ $^ $(EXTRA_LDFLAGS)
 
 $(sort $(RTDEPS)): $(DEPDIR)/%.d: %.c
 	@mkdir -p $(dir $@)
@@ -881,17 +883,17 @@ $(sort $(RTDEPS)): $(DEPDIR)/%.d: %.c
 # Rules to make .o (object) files
 $(sort $(RTOBJS)) : $(OBJDIR)/%.o : %.c $(DEPDIR)/%.d
 	$(ECHO) Compiling realtime $<
-	@rm -f $@
-	@mkdir -p $(dir $@)
-	$(Q)$(CC) -c $(OPT) $(DPKG_CFLAGS) $(DEBUG) $(CPPFLAGS) \
+	rm -f $@
+	mkdir -p $(dir $@)
+	$(Q)$(CC) $(SYSROOT_FLAGS) -c $(OPT) $(DPKG_CFLAGS) $(DEBUG) $(CPPFLAGS) \
 	    $(SYSROOT_FLAGS) $(EXTRA_CFLAGS) $< -o $@
 
 # Rules to make .o (object) files from .cc
 $(sort $(CXXRTOBJS)) : $(OBJDIR)/%.o : %.cc $(DEPDIR)/%.d
 	$(ECHO) Compiling realtime++ $<
-	@rm -f $@
-	@mkdir -p $(dir $@)
-	$(Q)$(CXX) -c $(OPT) $(DEBUG) $(RT_CXXFLAGS) $(CPPFLAGS) \
+	rm -f $@
+	mkdir -p $(dir $@)
+	$(Q)$(CXX) $(SYSROOT_FLAGS) -c$(OPT) $(DEBUG) $(RT_CXXFLAGS) $(CPPFLAGS) \
 	    $(SYSROOT_FLAGS) $(EXTRA_CFLAGS) $< -o $@
 
 ###############################################################################################

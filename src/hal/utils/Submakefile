@@ -85,15 +85,7 @@ USERSRCS += $(HALMETERSRCS)
 		../lib/libhalulapi.so.0 \
 		../lib/libmachinetalk-pb2++.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  $(GTK_LIBS) \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
-	
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  $(GTK_LIBS)
 TARGETS += ../bin/halmeter
 
 HALSCOPESRCS := \
@@ -113,15 +105,7 @@ USERSRCS += $(HALSCOPESRCS)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(GTK_LIBS) \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
-	
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(GTK_LIBS)
 TARGETS += ../bin/halscope
 
 HALGTKSRCS := \
@@ -150,15 +134,7 @@ USERSRCS += $(PCIWRITESRCS)
 ../libexec/pci_write: $(call TOOBJS, $(PCIWRITESRCS))
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ \
-	-L../lib \
-	-lhal \
-	-lhalulapi \
-	-lrtapi_math \
-	-lmachinetalk-pb2++ \
-	-lmkini \
-	-llinuxcncshm
-	
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../libexec/pci_write
 
 PCIREADSRCS := hal/utils/pci_read.c hal/utils/upci.c

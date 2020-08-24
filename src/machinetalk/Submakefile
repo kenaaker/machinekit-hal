@@ -270,20 +270,20 @@ PROTO_JS_SRCS +=$(JSGEN)/nanopb.js
 
 # --- misc supporting files ----
 ../lib/python/$(NAMESPACEDIR)/nanopb_generator.py: $(NANOPB)/generator/nanopb_generator.py
-	@mkdir -p ../lib/python/$(NAMESPACEDIR)/
+	mkdir -p ../lib/python/$(NAMESPACEDIR)/
 	cp $^ $@
 
 ../lib/python/$(NAMESPACEDIR)/__init__.py:
-	@mkdir -p ../lib/python/$(NAMESPACEDIR)/
+	mkdir -p ../lib/python/$(NAMESPACEDIR)/
 	touch ../lib/python/$(NAMESPACEDIR)/__init__.py
 
 ../lib/python/$(MACHINETALK)/__init__.py:
-	@mkdir -p ../lib/python/$(MACHINETALK)/
+	mkdir -p ../lib/python/$(MACHINETALK)/
 	touch ../lib/python/$(MACHINETALK)/__init__.py
 
 # the nanopb plugin executable
 ../lib/python/$(NAMESPACEDIR)/protoc-gen-nanopb: $(NANOPB)/generator/protoc-gen-nanopb
-	@mkdir -p ../lib/python/$(NAMESPACEDIR)/
+	mkdir -p ../lib/python/$(NAMESPACEDIR)/
 	cp $^ $@
 	chmod 755 $@
 
@@ -296,8 +296,8 @@ $(call TOOBJSDEPS, $(NANOPB_LIBSRCS)) : EXTRAFLAGS += $(PROTO_NANOPB_CFLAGS) -fP
 
 $(NANOPROTOCLIB).0: $(patsubst %.c,objects/%.o,$(NANOPB_LIBSRCS))
 	$(ECHO) Linking $(notdir $@)
-	@mkdir -p ../lib
-	@rm -f $@
+	mkdir -p ../lib
+	rm -f $@
 	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^
 
 
@@ -306,8 +306,8 @@ $(call TOOBJSDEPS, $(PROTO_CXX_SRCS)) : EXTRAFLAGS += $(PROTOCXX_CXX_FLAGS)
 
 $(PROTOCXXLIB).0: $(patsubst %.cc,objects/%.o,$(PROTO_CXX_SRCS))
 	$(ECHO) Linking $(notdir $@)
-	@mkdir -p ../lib
-	@rm -f $@
+	mkdir -p ../lib
+	rm -f $@
 	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-soname,$(notdir $@) -shared -o $@ $^ \
 		$(PROTOBUF_LIBS)
 
@@ -385,4 +385,4 @@ TARGETS += $(NANOPROTOCLIB) $(NANOPROTOCLIB).0 \
 clean: machinetalk-clean
 machinetalk-clean:
 	rm -rf $(PBGEN) ../include/$(MACHINETALK)
-	rm -rf ../lib/python/$(MACHINETALK)
+	rm -rf ../lib/python
