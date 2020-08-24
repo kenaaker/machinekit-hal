@@ -83,7 +83,7 @@ $(ULAPI_LIB).0: $(call TOOBJS, $(ULAPI_SRCS)) \
 	$(ECHO) Creating shared library $(notdir $@)
 	@mkdir -p ../lib
 	@rm -f $@
-	$(Q)$(CC) $(LDFLAGS) -Wl,-rpath,$(HAL_RTLIB_DIR) \
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -Wl,-rpath,$(HAL_RTLIB_DIR) \
 	    -Wl,-soname,$(notdir $@) -shared \
 	    -o $@ $^ -ldl
 
@@ -249,7 +249,7 @@ $(call TOOBJSDEPS, rtapi/rtapi_app.cc): \
 	../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CXX) -Wl,--no-as-needed \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) -Wl,--no-as-needed \
 	    -Wl,-rpath,$(HAL_RTLIB_DIR) \
 	    $(RTAPI_APP_RPATH) \
 	    -o $@ \
@@ -297,7 +297,7 @@ $(call TOOBJSDEPS, $(RTAPI_MSGD_SRCS)): \
 	../lib/libmachinetalk-pb2++.so
 	$(ECHO) Linking $(notdir $@)
 	@mkdir -p $(dir $@)
-	$(Q)$(CC)  $(LDFLAGS) -o $@ $^ $(RTAPI_MSGD_LDFLAGS) -lrt $(ZMQ_LIBS)
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(RTAPI_MSGD_LDFLAGS) -lrt $(ZMQ_LIBS)
 
 USERSRCS += $(RTAPI_MSGD_SRCS)
 TARGETS += ../libexec/rtapi_msgd

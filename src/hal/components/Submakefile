@@ -46,7 +46,7 @@ obj-m += $(patsubst hal/drivers/%.comp, %.o, \
 
 $(COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/components/%.comp  ../bin/comp
 	$(ECHO) Making comp docpage $(notdir $@)
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)../bin/comp --document \
 	--frontmatter="edit-repo: $(EDIT_REPO)" 	\
 	--frontmatter="edit-branch: $(EDIT_BRANCH)" 	\
@@ -54,7 +54,7 @@ $(COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/components/%.comp  ../bin/comp
 
 $(USER_COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/user_comps/%.comp  ../bin/comp
 	$(ECHO) Making comp docpage $(notdir $@)
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)../bin/comp --document \
 	--frontmatter="edit-repo: $(EDIT_REPO)" 	\
 	--frontmatter="edit-branch: $(EDIT_BRANCH)" 	\
@@ -62,7 +62,7 @@ $(USER_COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/user_comps/%.comp  ../bin/com
 
 $(DRIVER_COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/drivers/%.comp ../bin/comp
 	$(ECHO) Making driver comp docpage $(notdir $@)
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)../bin/comp --document  \
 	--frontmatter="edit-repo: $(EDIT_REPO)" 	\
 	--frontmatter="edit-branch: $(EDIT_BRANCH)" 	\
@@ -71,7 +71,7 @@ $(DRIVER_COMP_DOCPAGES): ../man/man9/%.asciidoc: hal/drivers/%.comp ../bin/comp
 $(MSG_COMP_DOCPAGES): ../man/man9/%.asciidoc: \
 		machinetalk/msgcomponents/%.comp ../bin/comp
 	$(ECHO) Making message comp docpage $(notdir $@)
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)../bin/comp --document  \
 	--frontmatter="edit-repo: $(EDIT_REPO)" 	\
 	--frontmatter="edit-branch: $(EDIT_BRANCH)" 	\
@@ -80,7 +80,7 @@ $(MSG_COMP_DOCPAGES): ../man/man9/%.asciidoc: \
 # Build .c sources
 objects/%.c: %.comp ../bin/comp
 	$(ECHO) "Preprocessing $(notdir $<)"
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)../bin/comp --require-license -o $@ $<
 
 # Generate rules for building component.so files from component.comp files
@@ -123,7 +123,7 @@ USERSRCS += $(HALSTREAMERSRCS)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/halstreamer
 
 HALSAMPLERSRCS := hal/components/sampler_usr.c
@@ -136,7 +136,7 @@ USERSRCS += $(HALSAMPLERSRCS)
 		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(LDFLAGS) -o $@ $^
+	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^
 TARGETS += ../bin/halsampler
 
 # C-language components
