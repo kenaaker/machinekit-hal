@@ -82,7 +82,8 @@ USERSRCS += $(HALMETERSRCS)
 ../bin/halmeter: \
 		$(call TOOBJS, $(HALMETERSRCS)) \
 		../lib/libhal.so.0 \
-		../lib/libhalulapi.so.0
+		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  $(GTK_LIBS) \
 	-L../lib \
@@ -109,6 +110,7 @@ USERSRCS += $(HALSCOPESRCS)
 ../bin/halscope: $(call TOOBJS, $(HALSCOPESRCS)) \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(GTK_LIBS) \

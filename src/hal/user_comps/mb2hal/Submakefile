@@ -24,6 +24,8 @@ USERSRCS += $(MB2HAL_SRCS)
 		../lib/libhalulapi.so.0 \
 		../lib/liblinuxcncshm.so.0 \
 		../lib/libhal.so.0 \
+		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libmkini.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)@$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(MB2HAL_LDFLAGS)
