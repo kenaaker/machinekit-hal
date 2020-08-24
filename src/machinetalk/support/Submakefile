@@ -5,10 +5,9 @@ ifeq ($(USE_PROTOBUF),yes)
 #ifeq ($(BUILD_EXAMPLES),yes)
 PBEX := $(MACHINETALK)/support
 
-ENCDEC_SRCS :=  $(addprefix $(PBEX)/, \
-	encdec.cc)
-ENCDEC_CXX_CFLAGS = -g  $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
-ENCDEC_CXX_LDFLAGS=  $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lstdc++
+ENCDEC_SRCS :=  $(addprefix $(PBEX)/, encdec.cc)
+ENCDEC_CXX_CFLAGS := $(DEBUG) $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
+ENCDEC_CXX_LDFLAGS := $(DEBUG) $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lprotobuf
 
 PB2CXX_PROTOLIB = ../lib/libmachinetalk-pb2++.so
 
@@ -17,13 +16,12 @@ $(call TOOBJSDEPS, $(ENCDEC_SRCS)) : EXTRAFLAGS += $(ENCDEC_CXX_CFLAGS)
 ../bin/encdec: $(call TOOBJS, $(ENCDEC_SRCS)) \
 	$(PB2CXX_PROTOLIB)  ../lib/libmtalk.so ../lib/libmachinetalk-pb2++.so ../lib/libmkini.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) $(ENCDEC_CXX_LDFLAGS) -o $@ $^
 
 #----
-POSITION_SRCS :=  $(addprefix $(PBEX)/, \
-	position.cc)
-POSITION_CXX_CFLAGS = -g  $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
-POSITION_CXX_LDFLAGS=  $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lstdc++
+POSITION_SRCS :=  $(addprefix $(PBEX)/, position.cc)
+POSITION_CXX_CFLAGS = $(DEBUG) $(PROTOBUF_CFLAGS) $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
+POSITION_CXX_LDFLAGS = $(DEBUG) $(CXX_PROTOLIB) $(PROTOBUF_LIBS) $(JANSSON_LIBS) -lprotobuf
 
 PB2CXX_PROTOLIB = ../lib/libmachinetalk-pb2++.so
 
@@ -32,14 +30,13 @@ $(call TOOBJSDEPS, $(POSITION_SRCS)) : EXTRAFLAGS += $(POSITION_CXX_CFLAGS)
 ../bin/position: $(call TOOBJS, $(POSITION_SRCS)) \
 	 ../lib/libmtalk.so $(PB2CXX_PROTOLIB)  ../lib/libmkini.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) $(POSITION_CXX_LDFLAGS) -o $@ $^ 
 
 #---
 
-NPDECODE_SRCS :=  $(addprefix $(PBEX)/, \
-	npbdecode.c)
+NPDECODE_SRCS :=  $(addprefix $(PBEX)/, npbdecode.c)
 NPBC_PROTOLIB = ../lib/libmachinetalk-npb.so
-NPDECODE_CFLAGS = -g  -I../../ -DPB_FIELD_32BIT
+NPDECODE_CFLAGS = -I../../ -DPB_FIELD_32BIT
 NPDECODE_LDFLAGS = $(NPBC_PROTOLIB)
 
 $(call TOOBJSDEPS, $(NPDECODE_SRCS)) : EXTRAFLAGS += $(NPDECODE_CFLAGS)
@@ -47,41 +44,40 @@ $(call TOOBJSDEPS, $(NPDECODE_SRCS)) : EXTRAFLAGS += $(NPDECODE_CFLAGS)
 ../bin/npbdecode: $(call TOOBJS, $(NPDECODE_SRCS)) \
 	$(NPBC_PROTOLIB)
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) $(NPDECODE_LDFLAGS) -o $@ $^ 
 
 
-RTPRINTF_SRCS :=  $(addprefix $(PBEX)/, \
-	rtprintf.c)
-RTPRINTF_CCFLAGS := -g -DPB_FIELD_32BIT
-RTPRINTF_LDFLAGS := -g
+RTPRINTF_SRCS :=  $(addprefix $(PBEX)/, rtprintf.c)
+RTPRINTF_CCFLAGS := $(DEBUG) -DPB_FIELD_32BIT
+RTPRINTF_LDFLAGS := $(DEBUG)
 
 $(call TOOBJSDEPS, $(RTPRINTF_SRCS)) : EXTRAFLAGS += $(RTPRINTF_CCFLAGS)
 
 ../bin/rtprintf: $(call TOOBJS, $(RTPRINTF_SRCS)) \
 	../lib/libmachinetalk-npb.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RTPRINTF_LDFLAGS)
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RTPRINTF_LDFLAGS)
 
 
 RAWREAD_SRCS :=  $(PBEX)/rawread.c \
 		 $(MACHINETALK)/nanopb/pb_decode.c
-RAWREAD_CCFLAGS := -g -O0 -DPB_FIELD_32BIT
-RAWREAD_LDFLAGS := -g
+RAWREAD_CCFLAGS := $(DEBUG) -O0 -DPB_FIELD_32BIT
+RAWREAD_LDFLAGS := $(DEBUG)
 
 $(call TOOBJSDEPS, $(RAWREAD_SRCS)) : EXTRAFLAGS += $(RAWREAD_CCFLAGS)
 
 ../bin/rawread: $(call TOOBJS, $(RAWREAD_SRCS))
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RAWREAD_LDFLAGS)
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS) $(RAWREAD_LDFLAGS)
 
 ../include/%.h: ./$(PBEX)/%.h
 	$(ECHO) Copying header file $@
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)cp $^ $@
 
 ../include/%.hh: ./$(PBEX)/%.hh
 	$(ECHO) Copying header file $@
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)cp $^ $@
 
 
@@ -90,8 +86,8 @@ UNIONREAD_SRCS :=  $(PBEX)/unionread.c \
 		 $(MACHINETALK)/nanopb/pb_decode.c \
 		 $(MACHINETALK)/nanopb/pb_common.c
 
-UNIONREAD_CCFLAGS := -g -O0 -DPB_FIELD_32BIT
-UNIONREAD_LDFLAGS := -g
+UNIONREAD_CCFLAGS := $(DEBUG) -O0 -DPB_FIELD_32BIT
+UNIONREAD_LDFLAGS := $(DEBUG)
 
 $(call TOOBJSDEPS, $(UNIONREAD_SRCS)) : EXTRAFLAGS += $(UNIONREAD_CCFLAGS)
 
@@ -101,12 +97,12 @@ $(call TOOBJSDEPS, $(UNIONREAD_SRCS)) : EXTRAFLAGS += $(UNIONREAD_CCFLAGS)
 
 ../include/%.h: ./$(PBEX)/%.h
 	$(ECHO) Copying header file $@
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)cp $^ $@
 
 ../include/%.hh: ./$(PBEX)/%.hh
 	$(ECHO) Copying header file $@
-	@mkdir -p $(dir $@)
+	mkdir -p $(dir $@)
 	$(Q)cp $^ $@
 
 $(call TOOBJSDEPS, $(PBEX)/sizes.c) : EXTRAFLAGS +=
@@ -116,11 +112,11 @@ $(call TOOBJSDEPS, $(PBEX)/sizes.c) : EXTRAFLAGS +=
 	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^ $(LDFLAGS)
 
 USERSRCS += \
-	 $(RTPRINTF_SRCS) \
+	$(RTPRINTF_SRCS) \
 	$(ENCDEC_SRCS) \
 	$(POSITION_SRCS) \
 	$(RAWREAD_SRCS) \
-	 $(UNIONREAD_SRCS) \
+	$(UNIONREAD_SRCS) \
 	$(NPDECODE_SRCS) \
 	$(PBEX)/sizes.c
 
@@ -143,24 +139,23 @@ TARGETS += \
 
 PYTARGETS += ../lib/python/pb2json.py
 
-
 # jepler demo
 
 LINMOVE_SRCS :=  $(addprefix $(PBEX)/, \
 	linmove.cc)
-LINMOVE_CXX_CFLAGS = -g $(PROTOBUF_CFLAGS)  $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
-LINMOVE_CXX_LDFLAGS=  $(CXX_PROTOLIB) $(PROTOBUF_LIBS)  $(JANSSON_LIBS) \
+LINMOVE_CXX_CFLAGS = $(DEBUG) $(PROTOBUF_CFLAGS)  $(JANSSON_CFLAGS)  -DPB_FIELD_32BIT
+LINMOVE_CXX_LDFLAGS = $(DEBUG) $(CXX_PROTOLIB) $(PROTOBUF_LIBS)  $(JANSSON_LIBS) \
 	../lib/libmtalk.so  \
-	 ../lib/libmachinetalk-pb2++.so \
+	../lib/libmachinetalk-pb2++.so \
 	../lib/libmkini.so \
-	-lstdc++
+	-lprotobuf
 
 $(call TOOBJSDEPS, $(LINMOVE_SRCS)) : EXTRAFLAGS += $(LINMOVE_CXX_CFLAGS)
 
 ../bin/linmove: $(call TOOBJS, $(LINMOVE_SRCS)) \
 	../lib/libmtalk.so ../lib/libmachinetalk-pb2++.so
 	$(ECHO) Linking $(notdir $@)
-	$(Q)$(CC) $(SYSROOT_FLAGS) $(LDFLAGS) -o $@ $^  \
+	$(Q)$(CXX) $(SYSROOT_FLAGS) $(LDFLAGS) $(LINMOVE_CXX_LDFLAGS) -o $@ $^  \
 
 USERSRCS += $(LINMOVE_SRCS)
 
