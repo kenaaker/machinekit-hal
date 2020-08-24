@@ -33,6 +33,7 @@ USER_COMP_BINS := $(patsubst hal/user_comps/%.comp, ../bin/%, $(USER_COMP_COMPS)
 		$(patsubst  hal/user_comps/%.comp, objects/hal/user_comps/%.c, $<) \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/librtapi_math.so.0
 
 TARGETS +=  $(USER_COMP_BINS)
@@ -48,6 +49,7 @@ $(call TOOBJSDEPS, $(MODBUSSRCS)) : EXTRAFLAGS += $(MODBUSCCFLAGS)
 ../bin/gs2_vfd: \
 		$(call TOOBJS, $(MODBUSSRCS)) \
 		../lib/libhal.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) -o $@ $^ $(LDFLAGS) $(MODBUSLDFLAGS)
@@ -60,6 +62,7 @@ USERSRCS += $(SHUTTLEXPRESS_SRC)
 ../bin/shuttlexpress: \
 		$(call TOOBJS, $(SHUTTLEXPRESS_SRC)) \
 		../lib/libhal.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^
@@ -75,6 +78,7 @@ $(call TOOBJSDEPS, $(XHC_HB04_SRC)) : EXTRAFLAGS += $(LIBUSB10_CFLAGS)
 		$(call TOOBJS, $(XHC_HB04_SRC)) \
 		../lib/libhal.so.0 \
 		../lib/libhalulapi.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libmkini.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) Linking $(notdir $@)

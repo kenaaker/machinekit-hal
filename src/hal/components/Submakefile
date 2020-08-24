@@ -119,6 +119,8 @@ USERSRCS += $(HALSTREAMERSRCS)
 ../bin/halstreamer: \
 		$(call TOOBJS, $(HALSTREAMERSRCS)) \
 		../lib/libhal.so.0 \
+		../lib/libmkini.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^
@@ -130,6 +132,8 @@ USERSRCS += $(HALSAMPLERSRCS)
 ../bin/halsampler: \
 		$(call TOOBJS, $(HALSAMPLERSRCS)) \
 		../lib/libhal.so.0 \
+		../lib/libmkini.so.0 \
+		../lib/libmachinetalk-pb2++.so.0 \
 		../lib/libhalulapi.so.0
 	$(ECHO) Linking $(notdir $@)
 	$(Q)$(CC) $(LDFLAGS) -o $@ $^
