@@ -26,7 +26,7 @@ USER_COMP_BINS := $(patsubst hal/user_comps/%.comp, ../bin/%, $(USER_COMP_COMPS)
 		../lib/libhalulapi.so.0 \
 		../lib/librtapi_math.so.0
 	$(ECHO) "Preprocessing usercomp $(notdir $<)"
-	@mkdir -p objects/hal/user_comps
+	mkdir -p objects/hal/user_comps
 	$(Q)../bin/comp -o $(patsubst  hal/user_comps/%.comp, objects/hal/user_comps/%.c, $<) $<
 	$(ECHO) "Compiling usercomp $(notdir $<)"
 	$(Q)$(CC) $(SYSROOT_FLAGS) -DULAPI $(INCLUDE) -o $@ $(LDFLAGS) \
